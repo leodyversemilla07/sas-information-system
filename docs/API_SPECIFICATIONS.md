@@ -24,18 +24,20 @@ This document defines the REST API contracts for the SAS Information System's th
 - **Status Codes**: Meaningful HTTP status codes for success/error states
 - **Idempotency**: PUT, PATCH, DELETE operations are idempotent
 - **Versioning**: API version in URL path (`/v1/`) for backward compatibility
-- **Authentication**: Bearer token (Laravel Sanctum) for authenticated endpoints
+- **Authentication**: Session-based authentication (Laravel Fortify) for Inertia.js SPA
 - **Pagination**: Cursor-based for large datasets
 - **Rate Limiting**: 60 requests/minute per user, 300 requests/minute per IP
+
+> **Note:** This system uses session-based authentication via Laravel Fortify for the Inertia.js frontend. API token authentication (Sanctum) can be added later if external API access or mobile apps are required.
 
 ---
 
 ## Authentication
 
-### Obtain Access Token
+### Login (Session-Based)
 
-**Endpoint:** `POST /auth/login`  
-**Description:** Authenticate user and receive access token  
+**Endpoint:** `POST /login`  
+**Description:** Authenticate user and create session  
 **Authentication:** None (public)
 
 **Request Body:**
@@ -57,15 +59,16 @@ This document defines the REST API contracts for the SAS Information System's th
       "student_id": "2024-00123",
       "name": "Maria Santos",
       "email": "maria.santos@minsubongabong.edu.ph",
-      "role": "student",
+      "roles": ["student"],
+      "permissions": ["submit_scholarship_application", "request_documents"],
       "created_at": "2025-09-01T08:00:00Z"
-    },
-    "token": "1|laravel_sanctum_token_here",
-    "expires_at": "2025-10-18T08:00:00Z"
+    }
   },
   "message": "Login successful"
 }
 ```
+
+> **Note:** Authentication uses Laravel session cookies. The session is automatically managed by Laravel Fortify and persists across requests.
 
 **Response (401 Unauthorized):**
 ```json
@@ -98,14 +101,9 @@ This document defines the REST API contracts for the SAS Information System's th
 
 ### Logout
 
-**Endpoint:** `POST /auth/logout`  
-**Description:** Invalidate current access token  
+**Endpoint:** `POST /logout`  
+**Description:** End current session  
 **Authentication:** Required
-
-**Request Headers:**
-```
-Authorization: Bearer 1|laravel_sanctum_token_here
-```
 
 **Response (200 OK):**
 ```json
@@ -119,7 +117,7 @@ Authorization: Bearer 1|laravel_sanctum_token_here
 
 ### Get Authenticated User
 
-**Endpoint:** `GET /auth/user`  
+**Endpoint:** `GET /user`  
 **Description:** Retrieve current user profile  
 **Authentication:** Required
 
@@ -135,8 +133,8 @@ Authorization: Bearer 1|laravel_sanctum_token_here
     "program": "BS Computer Science",
     "year_level": 3,
     "enrollment_status": "enrolled",
-    "role": "student",
-    "permissions": ["submit_scholarship_application", "request_documents"],
+    "roles": ["student"],
+    "permissions": ["submit_scholarship_application", "request_documents", "view_own_records"],
     "created_at": "2025-09-01T08:00:00Z"
   }
 }

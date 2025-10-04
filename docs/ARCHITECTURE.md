@@ -68,9 +68,8 @@ We chose a **modular monolith** over microservices for the following reasons:
 | **Framework** | Laravel | 12.x | Full-stack PHP framework with batteries-included approach |
 | **Language** | PHP | 8.2+ | Modern PHP with type declarations, attributes, and performance improvements |
 | **ORM** | Eloquent | Built-in | Active Record pattern for database interactions |
-| **Authentication** | Laravel Fortify | 1.x | Headless authentication backend (login, registration, 2FA) |
-| **Authorization** | Spatie Permission | 6.x | Role and permission management |
-| **API Auth** | Laravel Sanctum | 4.x | API token authentication for mobile/SPA |
+| **Authentication** | Laravel Fortify | 1.x | Headless authentication backend (login, registration, 2FA, session-based auth) |
+| **Authorization** | Spatie Permission | 6.x | Role and permission management (RBAC) |
 | **Navigation** | Laravel Wayfinder | 0.x | Type-safe route generation for frontend |
 | **Task Scheduling** | Laravel Scheduler | Built-in | Cron job management for periodic tasks |
 | **Queue System** | Laravel Queue | Built-in | Background job processing (database driver, Redis-ready) |
@@ -140,7 +139,7 @@ We chose a **modular monolith** over microservices for the following reasons:
 │              Laravel Application (Modular Monolith)              │
 ├─────────────────────────────────────────────────────────────────┤
 │                 Authentication & Authorization                   │
-│          (Fortify + Sanctum + Spatie Permissions)               │
+│              (Fortify + Spatie Permissions)                      │
 ├────────────┬──────────────────────┬─────────────────────────────┤
 │  USG       │    Registrar        │         SAS                  │
 │  Module    │    Module           │         Module               │
@@ -1605,32 +1604,67 @@ npm run build:ssr   # SSR build for server-side rendering
 
 ### Authorization (RBAC)
 
-**Roles (Spatie Permission):**
+> **📚 Complete Documentation:** See [RBAC.md](./RBAC.md) for comprehensive role-based access control documentation including permissions matrix, policy examples, frontend authorization, and testing guide.
 
-| Role | Permissions | Module Access |
-|------|-------------|---------------|
-| **Student** | View own data, submit applications/requests | All modules (limited) |
-| **SAS Staff** | Manage scholarships, events, organizations | SAS module |
-| **SAS Admin** | Approve scholarships, manage staff | SAS module (full) |
-| **Registrar Staff** | Process document requests, view payments | Registrar module |
-| **USG President** | Manage USG content, officers, announcements | USG module |
-| **System Admin** | Full system access, user management | All modules |
+**Package:** Spatie Laravel Permission v6.21.0
+
+**8 User Roles:**
+
+| Role | Permission Count | Module Access | Description |
+|------|-----------------|---------------|-------------|
+| **Student** | 16 | All modules (limited) | View own data, submit applications/requests |
+| **SAS Staff** | 18 | SAS module | Review scholarships, manage organizations, events |
+| **SAS Admin** | 23 | SAS module (full) | Approve high-value scholarships (≥₱20k), reports |
+| **Registrar Staff** | 8 | Registrar module | Process document requests, verify payments |
+| **Registrar Admin** | 11 | Registrar module (full) | Manage enrollment, issue refunds, edit records |
+| **USG Officer** | 14 | USG module | Create announcements/resolutions, respond to feedback |
+| **USG Admin** | 24 | USG module (full) | Manage VMGO, officers, publish content |
+| **System Admin** | 79 (all) | All modules | Full system access, user/role management |
 
 **Permission Examples:**
-- `sas.scholarships.view`
-- `sas.scholarships.create`
-- `sas.scholarships.approve`
-- `registrar.requests.process`
-- `usg.announcements.publish`
+- `submit_scholarship_application`
+- `approve_scholarships_under_20k`
+- `approve_scholarships_over_20k` (SAS Admin only)
+- `process_document_requests`
+- `issue_refunds` (Registrar Admin only)
+- `manage_vmgo` (USG Admin only)
+- `manage_users` (System Admin only)
 
-**Policy-Based Authorization:**
+**Type-Safe Enums:**
+
+```php
+// app/Enums/Role.php
+enum Role: string
+{
+    case Student = 'student';
+    case SasStaff = 'sas_staff';
+    case SasAdmin = 'sas_admin';
+    case RegistrarStaff = 'registrar_staff';
+    case RegistrarAdmin = 'registrar_admin';
+    case UsgOfficer = 'usg_officer';
+    case UsgAdmin = 'usg_admin';
+    case SystemAdmin = 'system_admin';
+}
+
+// app/Enums/Permission.php
+enum Permission: string
+{
+    // SAS Permissions
+    case SubmitScholarshipApplication = 'submit_scholarship_application';
+    case ApproveScholarshipsUnder20k = 'approve_scholarships_under_20k';
+    case ApproveScholarshipsOver20k = 'approve_scholarships_over_20k';
+    // ... 76 more permissions
+}
+```
+
+**Policy-Based Authorization with Business Logic:**
 
 ```php
 // app/Policies/SAS/ScholarshipPolicy.php
 namespace App\Policies\SAS;
 
 use App\Models\User;
-use App\Models\SAS\ScholarshipApplication;
+use App\Enums\Permission;
 
 class ScholarshipPolicy
 {
@@ -1639,10 +1673,10 @@ class ScholarshipPolicy
         return $user->hasAnyRole(['sas_staff', 'sas_admin', 'system_admin']);
     }
     
-    public function view(User $user, ScholarshipApplication $application): bool
+    public function view(User $user, $scholarship): bool
     {
         // Students can view their own applications
-        if ($user->student?->id === $application->student_id) {
+        if ($user->id === $scholarship->student_id) {
             return true;
         }
         
@@ -1650,22 +1684,142 @@ class ScholarshipPolicy
         return $user->hasAnyRole(['sas_staff', 'sas_admin', 'system_admin']);
     }
     
-    public function approve(User $user, ScholarshipApplication $application): bool
+    /**
+     * Amount-based approval authorization
+     * Business Rule: <₱20k = sas_staff, ≥₱20k = sas_admin only
+     */
+    public function approve(User $user, $scholarship): bool
     {
-        // Only SAS admins can approve
-        return $user->hasRole('sas_admin');
+        $amount = $scholarship->amount;
+        
+        // Under ₱20,000 - either staff or admin
+        if ($amount < 20000) {
+            return $user->can(Permission::ApproveScholarshipsUnder20k->value);
+        }
+        
+        // ≥ ₱20,000 - only admin
+        return $user->can(Permission::ApproveScholarshipsOver20k->value);
     }
 }
 
 // Usage in controller
-public function approve(ScholarshipApplication $application)
+public function approve(Request $request, Scholarship $scholarship)
 {
-    $this->authorize('approve', $application);
+    $this->authorize('approve', $scholarship);
     
-    $application->update(['status' => 'approved']);
+    $scholarship->update(['status' => 'approved', 'approved_by' => $request->user()->id]);
     
     return back()->with('success', 'Scholarship approved');
 }
+```
+
+**Route Protection with Middleware:**
+
+```php
+// routes/sas.php - Role-based protection
+Route::middleware(['auth', 'verified', 'role:sas_staff|sas_admin'])->group(function () {
+    Route::get('sas/dashboard', [DashboardController::class, 'index'])->name('sas.dashboard');
+    
+    // Permission-based protection
+    Route::patch('sas/scholarships/{scholarship}/approve', [ScholarshipController::class, 'approve'])
+        ->middleware('permission:approve_scholarships_under_20k|approve_scholarships_over_20k')
+        ->name('sas.scholarships.approve');
+});
+
+// routes/admin.php - System admin only
+Route::middleware(['auth', 'verified', 'role:system_admin'])->group(function () {
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('users', [UserController::class, 'index'])
+            ->middleware('permission:manage_users')
+            ->name('users.index');
+    });
+});
+```
+
+**Frontend Authorization (Inertia + React):**
+
+```typescript
+// resources/js/hooks/use-permissions.ts
+export function usePermissions() {
+    const { auth } = usePage<SharedData>().props;
+    
+    const hasRole = (role: string) => auth.roles.includes(role);
+    const hasPermission = (permission: string) => auth.permissions.includes(permission);
+    const can = (permission: string) => hasPermission(permission);
+    
+    // Convenience methods
+    const isSasAdmin = () => hasRole('sas_admin');
+    const isSystemAdmin = () => hasRole('system_admin');
+    
+    return { hasRole, hasPermission, can, isSasAdmin, isSystemAdmin };
+}
+
+// Usage in component
+import { Can, HasRole } from '@/components/authorization';
+
+function ScholarshipCard({ scholarship }) {
+    const { can, isSasAdmin } = usePermissions();
+    
+    return (
+        <div>
+            <h2>{scholarship.title}</h2>
+            
+            {/* Conditional rendering with hook */}
+            {can('approve_scholarships_over_20k') && <ApprovalButton />}
+            
+            {/* Or use component */}
+            <Can permission="approve_scholarships_over_20k">
+                <ApprovalButton />
+            </Can>
+            
+            <HasRole role={['sas_staff', 'sas_admin']}>
+                <StaffControls />
+            </HasRole>
+        </div>
+    );
+}
+```
+
+**Testing Authorization:**
+
+```php
+// tests/Unit/Policies/ScholarshipPolicyTest.php
+it('allows sas staff to approve scholarships under 20k', function () {
+    $staff = User::factory()->sasStaff()->create();
+    $scholarship = (object) ['amount' => 15000];
+    $policy = new ScholarshipPolicy;
+    
+    expect($policy->approve($staff, $scholarship))->toBeTrue();
+});
+
+it('denies sas staff from approving scholarships 20k and above', function () {
+    $staff = User::factory()->sasStaff()->create();
+    $scholarship = (object) ['amount' => 20000];
+    $policy = new ScholarshipPolicy;
+    
+    expect($policy->approve($staff, $scholarship))->toBeFalse();
+});
+
+// tests/Feature/MiddlewareProtectionTest.php
+it('allows sas admin to access reports', function () {
+    $admin = User::factory()->sasAdmin()->create();
+    
+    $response = $this->actingAs($admin)->get('/sas/reports/scholarships');
+    
+    $response->assertSuccessful();
+});
+```
+
+**Super Admin Pattern:**
+
+System administrators have access to all permissions:
+
+```php
+// In app/Providers/AppServiceProvider.php
+Gate::before(function (User $user, string $ability) {
+    return $user->hasRole('system_admin') ? true : null;
+});
+```
 ```
 
 ### Input Validation
