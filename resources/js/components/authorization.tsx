@@ -1,5 +1,5 @@
-import React from 'react';
 import { usePermissions } from '@/hooks/use-permissions';
+import React from 'react';
 
 interface CanProps {
     permission: string | string[];
@@ -52,7 +52,9 @@ interface HasRoleProps {
 export function HasRole({ role, children, fallback = null }: HasRoleProps) {
     const { hasRole, hasAnyRole } = usePermissions();
 
-    const hasRequiredRole = Array.isArray(role) ? hasAnyRole(...role) : hasRole(role);
+    const hasRequiredRole = Array.isArray(role)
+        ? hasAnyRole(...role)
+        : hasRole(role);
 
     return <>{hasRequiredRole ? children : fallback}</>;
 }
