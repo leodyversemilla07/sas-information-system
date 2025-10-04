@@ -1,5 +1,5 @@
-import { usePage } from '@inertiajs/react';
 import { SharedData } from '@/types';
+import { usePage } from '@inertiajs/react';
 
 /**
  * Hook to access user roles and permissions from Inertia shared data
@@ -50,14 +50,18 @@ export function usePermissions() {
      * Check if user has any of the specified permissions
      */
     const hasAnyPermission = (...permissions: string[]): boolean => {
-        return permissions.some((permission) => auth.permissions.includes(permission));
+        return permissions.some((permission) =>
+            auth.permissions.includes(permission),
+        );
     };
 
     /**
      * Check if user has all of the specified permissions
      */
     const hasAllPermissions = (...permissions: string[]): boolean => {
-        return permissions.every((permission) => auth.permissions.includes(permission));
+        return permissions.every((permission) =>
+            auth.permissions.includes(permission),
+        );
     };
 
     /**
@@ -134,7 +138,12 @@ export function usePermissions() {
      * Check if user has any admin role in any module
      */
     const isAnyAdmin = (): boolean => {
-        return hasAnyRole('sas_admin', 'registrar_admin', 'usg_admin', 'system_admin');
+        return hasAnyRole(
+            'sas_admin',
+            'registrar_admin',
+            'usg_admin',
+            'system_admin',
+        );
     };
 
     return {

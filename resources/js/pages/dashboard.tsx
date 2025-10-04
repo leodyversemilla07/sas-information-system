@@ -72,7 +72,8 @@ export default function Dashboard() {
                             </EmptyMedia>
                             <EmptyTitle>No Dashboard Data</EmptyTitle>
                             <EmptyDescription>
-                                Your dashboard content will appear here once data is available.
+                                Your dashboard content will appear here once
+                                data is available.
                             </EmptyDescription>
                         </EmptyHeader>
                     </Empty>
