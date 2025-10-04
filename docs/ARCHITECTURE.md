@@ -68,9 +68,8 @@ We chose a **modular monolith** over microservices for the following reasons:
 | **Framework** | Laravel | 12.x | Full-stack PHP framework with batteries-included approach |
 | **Language** | PHP | 8.2+ | Modern PHP with type declarations, attributes, and performance improvements |
 | **ORM** | Eloquent | Built-in | Active Record pattern for database interactions |
-| **Authentication** | Laravel Fortify | 1.x | Headless authentication backend (login, registration, 2FA) |
-| **Authorization** | Spatie Permission | 6.x | Role and permission management |
-| **API Auth** | Laravel Sanctum | 4.x | API token authentication for mobile/SPA |
+| **Authentication** | Laravel Fortify | 1.x | Headless authentication backend (login, registration, 2FA, session-based auth) |
+| **Authorization** | Spatie Permission | 6.x | Role and permission management (RBAC) |
 | **Navigation** | Laravel Wayfinder | 0.x | Type-safe route generation for frontend |
 | **Task Scheduling** | Laravel Scheduler | Built-in | Cron job management for periodic tasks |
 | **Queue System** | Laravel Queue | Built-in | Background job processing (database driver, Redis-ready) |
@@ -140,7 +139,7 @@ We chose a **modular monolith** over microservices for the following reasons:
 │              Laravel Application (Modular Monolith)              │
 ├─────────────────────────────────────────────────────────────────┤
 │                 Authentication & Authorization                   │
-│          (Fortify + Sanctum + Spatie Permissions)               │
+│              (Fortify + Spatie Permissions)                      │
 ├────────────┬──────────────────────┬─────────────────────────────┤
 │  USG       │    Registrar        │         SAS                  │
 │  Module    │    Module           │         Module               │

@@ -16,13 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive project documentation suite
 
 ### Changed
-- N/A
+- **Authentication Stack Clarification**: Removed Laravel Sanctum from core architecture
+  - Using session-based authentication via Laravel Fortify for Inertia.js SPA
+  - Sanctum can be added later if external API access or mobile apps are required
+  - Updated ARCHITECTURE.md to reflect Fortify + Spatie Permission stack
+  - Updated API_SPECIFICATIONS.md to use session-based authentication endpoints
+  - Session management provides sufficient security for single-campus SPA deployment
 
 ### Deprecated
 - N/A
 
 ### Removed
-- N/A
+- Laravel Sanctum from core technology stack (can be added later if needed)
 
 ### Fixed
 - N/A
