@@ -26,6 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Middleware aliases registered: `role`, `permission`, `role_or_permission`
   - User factory enhanced with role-specific states for testing
   - Two-factor authentication columns in users table (`two_factor_secret`, `two_factor_recovery_codes`, `two_factor_confirmed_at`)
+- **Protected Route Structure**: Comprehensive middleware-protected routes for all modules
+  - `routes/sas.php` - Student Affairs Services routes with role/permission middleware
+  - `routes/registrar.php` - Registrar module routes with document request and payment workflows
+  - `routes/usg.php` - USG Portal routes for announcements, resolutions, and officer management
+  - `routes/admin.php` - System administration routes for user/role management and system settings
+  - Smart dashboard routing based on user role in `routes/web.php`
+  - 150+ protected route endpoints with granular permission checks
 
 ### Changed
 - **Authentication Stack Clarification**: Removed Laravel Sanctum from core architecture
