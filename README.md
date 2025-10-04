@@ -198,51 +198,62 @@ npm run build:ssr                 # Server-side rendering build
 
 ## 📁 Project Structure
 
+The MinSU Bongabong Information System follows **Laravel 12's streamlined structure** with a **modular monolith architecture**, organizing code into three main modules: **SAS** (Student Affairs Services), **Registrar**, and **USG** (University Student Government).
+
+### High-Level Organization
+
 ```
 sas-information-system/
-├── app/
-│   ├── Http/
-│   │   ├── Controllers/     # Route controllers organized by module
-│   │   ├── Middleware/      # Custom middleware
-│   │   └── Requests/        # Form request validation
-│   ├── Models/              # Eloquent models (User, Student, etc.)
-│   └── Providers/           # Service providers (module registration)
-├── bootstrap/               # Laravel bootstrap files
+├── app/                     # Application core
+│   ├── Console/Commands/    # Custom Artisan commands (auto-registered)
+│   ├── Events/              # Domain events (organized by module)
+│   ├── Http/                # Controllers, Middleware, Requests, Resources
+│   ├── Jobs/                # Queued background jobs (organized by module)
+│   ├── Listeners/           # Event listeners (organized by module)
+│   ├── Mail/                # Mailable classes
+│   ├── Models/              # Eloquent models (organized by module)
+│   ├── Notifications/       # Laravel notifications
+│   ├── Policies/            # Authorization policies (organized by module)
+│   ├── Providers/           # Service providers
+│   └── Services/            # Business logic layer (organized by module)
+├── bootstrap/               # Laravel 12 bootstrap configuration
 ├── config/                  # Configuration files
-├── database/
-│   ├── factories/           # Model factories for testing
-│   ├── migrations/          # Database migrations
-│   └── seeders/             # Database seeders
+├── database/                # Migrations, factories, seeders (organized by module)
 ├── docs/                    # 📚 **Comprehensive Documentation**
-│   ├── ARCHITECTURE.md      # System architecture deep dive
-│   ├── DIRECTORY_STRUCTURE.md  # Complete file organization reference
-│   ├── INERTIA_PATTERNS.md  # Frontend patterns and conventions
-│   ├── PRD.md              # Product Requirements Document
-│   ├── USER_STORIES.md     # User stories with acceptance criteria
-│   ├── API_SPECIFICATIONS.md  # API contracts and integration
-│   ├── DATA_MODELS.md      # Database schema and ERD
-│   └── NFR.md              # Non-functional requirements
 ├── public/                  # Public assets and entry point
-├── resources/
-│   ├── css/                # Stylesheets (Tailwind entry)
-│   ├── js/                 # TypeScript/React source
-│   │   ├── components/     # Reusable React components
-│   │   ├── layouts/        # Page layouts
-│   │   ├── pages/          # Inertia page components
-│   │   ├── types/          # TypeScript type definitions
-│   │   └── app.tsx         # Frontend entry point
-│   └── views/              # Blade templates (minimal usage)
-├── routes/
-│   ├── web.php             # Web routes (Inertia)
-│   ├── auth.php            # Authentication routes
-│   ├── api.php             # API routes (webhooks, mobile)
-│   └── console.php         # Artisan commands
-├── storage/                # Application storage (logs, cache, uploads)
-├── tests/
-│   ├── Feature/            # Feature tests (Pest)
-│   └── Unit/               # Unit tests (Pest)
-└── vendor/                 # Composer dependencies
+├── resources/               # Frontend assets
+│   ├── css/                 # Tailwind CSS entry point
+│   ├── js/                  # TypeScript/React source
+│   │   ├── components/      # UI components (ui/, shared/, sas/, registrar/, usg/)
+│   │   ├── hooks/           # Custom React hooks
+│   │   ├── layouts/         # Page layouts
+│   │   ├── lib/             # Utility functions
+│   │   ├── pages/           # Inertia pages (organized by module)
+│   │   ├── types/           # TypeScript type definitions
+│   │   └── wayfinder/       # Generated type-safe routes
+│   └── views/               # Blade templates (minimal usage)
+├── routes/                  # Route definitions (web, auth, api, console, settings)
+├── storage/                 # Application storage (logs, cache, uploads)
+├── tests/                   # Feature & Unit tests (organized by module)
+└── vendor/                  # Composer dependencies
 ```
+
+### Key Structural Principles
+
+1. **Module Separation**: Each module (SAS, Registrar, USG) has dedicated subdirectories in `app/Http/Controllers/`, `app/Models/`, `app/Services/`, etc.
+2. **Event-Driven**: Cross-module communication via Events and Listeners (no direct coupling)
+3. **Laravel 12 Specific**: No `Kernel.php` files; commands auto-register from `app/Console/Commands/`
+4. **Type Safety**: Shared types between backend models and frontend TypeScript
+5. **Testing**: Feature and Unit tests organized by module in `tests/Feature/` and `tests/Unit/`
+
+### 📖 Complete Structure Reference
+
+**For the complete, detailed directory structure including all files and subdirectories**, see **[DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)**, which includes:
+- Complete project tree from root to leaf files
+- Module-specific file organization (SAS, Registrar, USG)
+- Naming conventions (backend PHP/Laravel & frontend TypeScript/React)
+- Laravel 12 specific notes and auto-registration details
+- Testing organization guidelines
 
 ## 📚 Documentation
 
