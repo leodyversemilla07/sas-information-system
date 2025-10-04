@@ -33,6 +33,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `routes/admin.php` - System administration routes for user/role management and system settings
   - Smart dashboard routing based on user role in `routes/web.php`
   - 150+ protected route endpoints with granular permission checks
+- **Frontend Authorization System**: Complete React/TypeScript permission checking
+  - `HandleInertiaRequests` middleware shares roles and permissions with frontend
+  - `usePermissions()` hook for checking roles and permissions in components
+  - Authorization components: `<Can>`, `<HasRole>`, `<Unless>`, `<HasAllPermissions>`
+  - TypeScript type definitions for `Auth` interface with roles and permissions arrays
+  - 15+ convenience methods (e.g., `isSasAdmin()`, `isSystemAdmin()`, `can()`, `cannot()`)
+- **Comprehensive Test Suite**: 50+ Pest tests for authorization
+  - `tests/Unit/RolesAndPermissionsTest.php` - Role assignment, permission checks, factory states
+  - `tests/Unit/Policies/ScholarshipPolicyTest.php` - Policy methods, amount-based approval logic
+  - `tests/Feature/MiddlewareProtectionTest.php` - Route protection, middleware, guest restrictions
+  - Tests cover all 8 roles, 79+ permissions, policy authorization, and unauthorized access
+- **Complete RBAC Documentation**:
+  - `docs/RBAC.md` - 900+ line comprehensive guide with permissions matrix, examples, testing
+  - `docs/ARCHITECTURE.md` - Updated authorization section with RBAC implementation details
+  - Includes role hierarchy, permission tables, policy examples, frontend patterns, best practices
 
 ### Changed
 - **Authentication Stack Clarification**: Removed Laravel Sanctum from core architecture
