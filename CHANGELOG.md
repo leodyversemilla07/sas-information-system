@@ -14,6 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Three-module architecture: Student Affairs Services (SAS), Registrar, and USG Portal
 - Inertia.js v2 for seamless server-side and client-side integration
 - Comprehensive project documentation suite
+- **Role-Based Access Control (RBAC) System**: Complete implementation using Spatie Laravel Permission v6.21.0
+  - 8 user roles: `student`, `sas_staff`, `sas_admin`, `registrar_staff`, `registrar_admin`, `usg_officer`, `usg_admin`, `system_admin`
+  - 79+ granular permissions organized by module (SAS, Registrar, USG, System)
+  - Type-safe Role and Permission enums (`app/Enums/Role.php`, `app/Enums/Permission.php`)
+  - Database seeder (`RoleAndPermissionSeeder`) with complete role-permission assignments
+  - 6 authorization policies in modular structure:
+    - SAS: `ScholarshipPolicy` (with ₱20k threshold approval logic), `OrganizationPolicy`, `EventPolicy`
+    - Registrar: `DocumentRequestPolicy`
+    - USG: `AnnouncementPolicy`, `ResolutionPolicy`
+  - Middleware aliases registered: `role`, `permission`, `role_or_permission`
+  - User factory enhanced with role-specific states for testing
+  - Two-factor authentication columns in users table (`two_factor_secret`, `two_factor_recovery_codes`, `two_factor_confirmed_at`)
 
 ### Changed
 - **Authentication Stack Clarification**: Removed Laravel Sanctum from core architecture
@@ -22,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated ARCHITECTURE.md to reflect Fortify + Spatie Permission stack
   - Updated API_SPECIFICATIONS.md to use session-based authentication endpoints
   - Session management provides sufficient security for single-campus SPA deployment
+- **User Model**: Added `HasRoles` trait from Spatie Laravel Permission for RBAC functionality
+- **Database Structure**: Consolidated two-factor authentication columns into main users table migration
 
 ### Deprecated
 - N/A
