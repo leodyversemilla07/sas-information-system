@@ -215,6 +215,7 @@ sas-information-system/
 │   └── seeders/             # Database seeders
 ├── docs/                    # 📚 **Comprehensive Documentation**
 │   ├── ARCHITECTURE.md      # System architecture deep dive
+│   ├── DIRECTORY_STRUCTURE.md  # Complete file organization reference
 │   ├── INERTIA_PATTERNS.md  # Frontend patterns and conventions
 │   ├── PRD.md              # Product Requirements Document
 │   ├── USER_STORIES.md     # User stories with acceptance criteria
@@ -255,13 +256,14 @@ Comprehensive documentation is available in the `docs/` directory:
 | **[DATA_MODELS.md](docs/DATA_MODELS.md)** | Database schema, ERD, entity relationships, business rules, migrations | Database Architects, Backend Developers |
 | **[NFR.md](docs/NFR.md)** | Performance, security, scalability, accessibility, compliance requirements | DevOps, Security, QA, Architects |
 | **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** | System architecture, integration patterns, technology decisions | Technical Leads, Architects |
+| **[DIRECTORY_STRUCTURE.md](docs/DIRECTORY_STRUCTURE.md)** | Complete file organization, naming conventions, module structure | All Developers |
 | **[INERTIA_PATTERNS.md](docs/INERTIA_PATTERNS.md)** | Frontend conventions, React patterns, Inertia best practices | Frontend Developers |
 
 ### Getting Started with Documentation
 
 1. **For Product Understanding**: Start with `PRD.md` to understand the vision and scope
 2. **For Development**: Review `USER_STORIES.md` for requirements, then `API_SPECIFICATIONS.md` and `DATA_MODELS.md`
-3. **For Architecture**: Read `ARCHITECTURE.md` for system design decisions
+3. **For Architecture**: Read `ARCHITECTURE.md` for system design decisions and `DIRECTORY_STRUCTURE.md` for file organization
 4. **For Production Readiness**: Check `NFR.md` for quality gates and performance targets
 
 ## 🧭 Module Feature Overview
