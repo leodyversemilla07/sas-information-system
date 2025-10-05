@@ -61,6 +61,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
+// Public USG landing page (public-facing)
+Route::get('/usg', function () {
+    return inertia('usg/landing');
+})->name('usg.landing');
+
 // USG Officer routes (usg_officer role)
 Route::middleware(['auth', 'verified', 'role:usg_officer|usg_admin'])->group(function () {
     Route::prefix('usg')->name('usg.')->group(function () {
