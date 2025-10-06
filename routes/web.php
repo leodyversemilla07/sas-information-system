@@ -19,6 +19,8 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
+// NOTE: USG public routes are defined in routes/usg.php
+
 // General authenticated routes
 Route::middleware(['auth', 'verified'])->group(function () {
     // Main dashboard - redirect based on role

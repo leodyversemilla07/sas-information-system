@@ -13,53 +13,53 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Public USG routes (authenticated students)
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::prefix('usg')->name('usg.')->group(function () {
-        // Public VMGO viewing
-        Route::get('vmgo', function () {
-            return inertia('usg/vmgo');
-        })->name('vmgo');
+// Public USG landing page (public-facing)
+Route::get('/usg', function () {
+    return inertia('usg/home');
+})->name('usg.landing');
 
-        // Public officers listing
-        Route::get('officers', function () {
-            return inertia('usg/officers/index');
-        })->name('officers.index');
+// Public VMGO viewing
+Route::get('vmgo', function () {
+    return inertia('usg/vmgo');
+})->name('vmgo');
 
-        Route::get('officers/{officer}', function () {
-            return inertia('usg/officers/show');
-        })->name('officers.show');
+// Public officers listing
+Route::get('officers', function () {
+    return inertia('usg/officers/index');
+})->name('officers.index');
 
-        // Public announcements
-        Route::get('announcements', function () {
-            return inertia('usg/announcements/index');
-        })->name('announcements.index');
+Route::get('officers/{officer}', function () {
+    return inertia('usg/officers/show');
+})->name('officers.show');
 
-        Route::get('announcements/{announcement}', function () {
-            return inertia('usg/announcements/show');
-        })->name('announcements.show');
+// Public announcements
+Route::get('announcements', function () {
+    return inertia('usg/announcements/index');
+})->name('announcements.index');
 
-        // Public resolutions
-        Route::get('resolutions', function () {
-            return inertia('usg/resolutions/index');
-        })->name('resolutions.index');
+Route::get('announcements/{announcement}', function () {
+    return inertia('usg/announcements/show');
+})->name('announcements.show');
 
-        Route::get('resolutions/{resolution}', function () {
-            return inertia('usg/resolutions/show');
-        })->name('resolutions.show');
+// Public resolutions
+Route::get('resolutions', function () {
+    return inertia('usg/resolutions/index');
+})->name('resolutions.index');
 
-        // Student feedback/concerns
-        Route::get('feedback', function () {
-            return inertia('usg/feedback/create');
-        })->middleware('permission:submit_feedback')
-            ->name('feedback.create');
+Route::get('resolutions/{resolution}', function () {
+    return inertia('usg/resolutions/show');
+})->name('resolutions.show');
 
-        Route::post('feedback', function () {
-            // Controller will handle
-        })->middleware('permission:submit_feedback')
-            ->name('feedback.store');
-    });
-});
+// Student feedback/concerns
+Route::get('feedback', function () {
+    return inertia('usg/feedback/create');
+})->middleware('permission:submit_feedback')
+    ->name('feedback.create');
+
+Route::post('feedback', function () {
+    // Controller will handle
+})->middleware('permission:submit_feedback')
+    ->name('feedback.store');
 
 // USG Officer routes (usg_officer role)
 Route::middleware(['auth', 'verified', 'role:usg_officer|usg_admin'])->group(function () {
